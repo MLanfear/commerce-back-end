@@ -1,5 +1,7 @@
 const express = require('express');
 const routes = require('./routes');
+const path = require('path');
+const session = require('express-session');
 // import sequelize connection
 const sequelize = require('./config/connection');
 
@@ -19,7 +21,7 @@ const sessionSettings = {
 };
 
 app.use(session(sessionSettings));
-app.use(express.static(path.join(__dirname, 'Develop')));
+app.use(express.static(path.join(__dirname, 'config')));
 
 
 // sync sequelize models to the database, then turn on the server

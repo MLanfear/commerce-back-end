@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const { Category, Product } = require('../../models');
+const seedCategories = require('../../seeds/category-seeds');
 
 // The `/api/categories` endpoint
 
@@ -74,13 +75,24 @@ router.post('/', async (req, res) => {
   }
 });
 
-router.put('/:id', (req, res) => {
+router.put('/category_id', async (req, res,) => { 
   // update a category by its `id` value
-
+  const categoryId = await Category.findOne({
+    where: {
+      category: req.body.category
+    }
+  });
+  if (categoryId) {}
 });
 
-router.delete('/:id', (req, res) => {
+router.delete('/category_name', (req, res) => {
   // delete a category by its `id` value
+  const categoryIndex = getcategoryIndex(req.params.category_name)
+
+  if (categoryIndex === -1) return res.status(404).json({})
+
+  Category.splice(categoryIndex, 1)
+  res.json(Category)
 });
 
 module.exports = router;

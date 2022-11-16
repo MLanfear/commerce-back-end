@@ -10,7 +10,9 @@ router.get('/', (req, res) => {
     include: [
       {
         model: Product,
-        attributes: []
+        attributes: [
+          'product_name', 'price', 'stock', 'category_id'
+        ]
       }
     ]
   })
@@ -28,7 +30,9 @@ Category.findOne({
   include: [
     {
       model: Product,
-      attributes: []
+      attributes: [
+        'product_name', 'price', 'stock', 'category_id'
+      ]
     }
   ],
     where: {

@@ -68,6 +68,8 @@ router.post('/', async (req, res) => {
     )
     req.session.save(() => {
       req.session.categoryID = dbCategory.id;
+      res.json('New category created!')
+
     })
   } catch (err) {
     console.log(err);
@@ -78,21 +80,26 @@ router.post('/', async (req, res) => {
 router.put('/category_id', async (req, res,) => { 
   // update a category by its `id` value
   const categoryId = await Category.findOne({
-    where: {
-      category: req.body.category
-    }
+    title: req.body.title,
+    category: req.body.category,
+    description: req.body.desc
   });
-  if (categoryId) {}
+  try {
+  categoryId.update({_id: id}, {
+    $set: categoryId
+  });
+  res.redirect('/category');
+  } catch (err) {
+    console.log(err);
+    res.status(500).json(err);
+  }
 });
 
-router.delete('/category_name', (req, res) => {
+router.delete('/category_id', (req, res) => {
   // delete a category by its `id` value
-  const categoryIndex = getcategoryIndex(req.params.category_name)
-
-  if (categoryIndex === -1) return res.status(404).json({})
-
-  Category.splice(categoryIndex, 1)
-  res.json(Category)
+  const categoryIndex = db.get('category');
+  categoryIndex.remove({"_id" : req.params.id});
+  res.redirect('/category');
 });
 
 module.exports = router;

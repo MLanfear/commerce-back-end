@@ -7,22 +7,16 @@ const { Product, Category, Tag, ProductTag } = require('../../models');
 router.get('/', (req, res) => {
   Product.findAll({
     include: [
+      Category,
       {
-        model: Category, Tag,
-        attributes: [
-          'product_name', 'price', 'stock','tag_id'
-        ]
+        model: Tag,
+        through: ProductTag
+        
       }
     ]
   })
-  .then(response => res.json(response))
-  .catch(err => {
-      console.log('an error occured');
-      console.log(err);
-      res.status(500).json(err);
-  });
-
-  // be sure to include its associated Category and Tag data
+  .then(products => res.json(products))
+  .catch(err => res.status(500).json(err));
 });
 
 
@@ -30,36 +24,28 @@ router.get('/', (req, res) => {
 
 
 
-// get one product
+// get one product vy ID
 router.get('/:id', (req, res) => {
-  // find a single product by its `id`
   Product.findOne({
-    include: [
-      {
-        model: Category, Tag,
-        attributes: [
-          'product_name', 'price', 'stock','tag_id'
-        ]
-      }
-    ],
     where: {
-      id:req.params.id
-    }
-  })
-  .then(response => {
-    if (!response) {
-        res.status(404).json({ message: "404 Product not Found!" });
-    } else {
-        res.json(response);
+      id: req.params.id
+    },
+    include: [
+      Category,
+      {
+        model: Tag,
+        through: ProductTag
       }
+    ]    
   })
-  .catch(err => {
-    console.log('an error occured');
-    console.log(err);
-    res.status(500).json(err);
-
-  });
-  // be sure to include its associated Category and Tag data
+  .then(product => {
+    if (!product) {
+        res.status(404).json({ message: "Product ID does not exist!" });
+        return
+      }
+      res.json(product)
+    })
+    .catch(err => res.status(500).json(err));
 });
 
 // create new product

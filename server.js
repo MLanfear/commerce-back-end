@@ -1,7 +1,5 @@
 const express = require('express');
 const routes = require('./routes');
-const path = require('path');
-const session = require('express-session');
 // import sequelize connection
 const sequelize = require('./config/connection');
 
@@ -26,13 +24,13 @@ app.use(express.static(path.join(__dirname, 'config')));
 
 // sync sequelize models to the database, then turn on the server
 sequelize.sync({ force: false }).then(()=> {
-  app.listen(PORT, () => console.log(`
-¥====================================================¥
+  app.listen(PORT, () => { console.log(`
+    ¥====================================================¥
 
-          SERVER IS ON AT ${PORT}
+              SERVER IS ON AT ${PORT}
 
-        COMMERCE MANAGEMENT BACK END!
-  
-¥====================================================¥
-  `));
+            COMMERCE MANAGEMENT BACK END!
+      
+    ¥====================================================¥ `);
+  });
 });

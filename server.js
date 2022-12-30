@@ -11,17 +11,6 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(routes);
 
-// Privatize information
-const sessionSettings = {
-  secret: process.env.SESSION_SECRET,
-  resave: false,
-  saveUninitialized: true,
-};
-
-app.use(session(sessionSettings));
-app.use(express.static(path.join(__dirname, 'config')));
-
-
 // sync sequelize models to the database, then turn on the server
 sequelize.sync({ force: false }).then(()=> {
   app.listen(PORT, () => { console.log(`

@@ -9,7 +9,9 @@ router.get('/', (req, res) => {
     include: [
       {
         model: Category, Tag,
-        // attributes i need to include
+        attributes: [
+          'product_name', 'price', 'stock','tag_id'
+        ]
       }
     ]
   })
@@ -23,9 +25,40 @@ router.get('/', (req, res) => {
   // be sure to include its associated Category and Tag data
 });
 
+
+
+
+
+
 // get one product
 router.get('/:id', (req, res) => {
   // find a single product by its `id`
+  Product.findOne({
+    include: [
+      {
+        model: Category, Tag,
+        attributes: [
+          'product_name', 'price', 'stock','tag_id'
+        ]
+      }
+    ],
+    where: {
+      id:req.params.id
+    }
+  })
+  .then(response => {
+    if (!response) {
+        res.status(404).json({ message: "404 Product not Found!" });
+    } else {
+        res.json(response);
+      }
+  })
+  .catch(err => {
+    console.log('an error occured');
+    console.log(err);
+    res.status(500).json(err);
+
+  });
   // be sure to include its associated Category and Tag data
 });
 

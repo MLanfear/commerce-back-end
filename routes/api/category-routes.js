@@ -1,27 +1,16 @@
 const router = require('express').Router();
 const { Category, Product } = require('../../models');
-const seedCategories = require('../../seeds/category-seeds');
 
 // The `/api/categories` endpoint
 
 router.get('/', (req, res) => {
   // find all categories
   Category.findAll({
-    include: [
-      {
-        model: Product,
-        attributes: [
-          'product_name', 'price', 'stock', 'category_id'
-        ]
-      }
-    ]
+    include: [Product]
   })
-    .then(response => res.json(response))
-    .catch(err => {
-      console.log('an error occured');
-      console.log(err);
-      res.status(500).json(err);
-    });
+    .then(categories => res.json(categories))
+    .catch(err => 
+      res.status(500).json(err));
 });
 
 router.get('/:id', (req, res) => {
@@ -83,27 +72,44 @@ router.post('/', async (req, res) => {
 
 router.put('/category_id', async (req, res,) => { 
   // update a category by its `id` value
-  const categoryId = await Category.findOne({
-    title: req.body.title,
-    category: req.body.category,
-    description: req.body.desc
-  });
-  try {
-  categoryId.update({_id: id}, {
-    $set: categoryId
-  });
-  res.redirect('/category');
-  } catch (err) {
-    console.log(err);
-    res.status(500).json(err);
-  }
+  Category.update(req.body, {
+    where: {
+      id: req.params.id
+    },
+  })
+    .then((category) => {
+      return Category.findAll({ where: { category_id: req.params.id } });
+    })
+    .then((categoryId) => {
+      const categoryIds = categoryId.map (({ category_id }) => category_id)
+      const newCategoryId = req.body.categoryIds  
+        .filter((category_id) => !categoryIds.includes(category_id))
+        .map((category_id) => {
+          return {
+            category_id :req.params.id,
+            category_id,
+          };
+        });
+      const categoryIdsToRemove = categoryId
+        .filter(({ category_id}) => !req.body.categoryIds.includes(category_id))
+        .map(({ id }) => id);
+      return Promise.all([
+        Category.destroy({ where: { id:categoryIdsToRemove} }),
+        Category.bulkCreate(newCategoryId)
+      ]);
+    })
+    .then((updatedCategoryId) => res.json(updatedCategoryId))
+    .catch((err) => {
+      res.status(400).json(err);
+    });
 });
+
 
 router.delete('/category_id', (req, res) => {
   // delete a category by its `id` value
   const categoryIndex = db.get('category');
   categoryIndex.remove({"_id" : req.params.id});
-  res.redirect('/category');
+  res.redirect('/categories');
 });
 
 module.exports = router;

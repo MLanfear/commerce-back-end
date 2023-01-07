@@ -20,7 +20,7 @@
 -   Run source db/schema.sql.
 -   Exit MySQL by using the command quit.
 -   Seed the database using the command ````npm run seed```.
--   Enter the command node index.js to start the application.
+-   Enter the command node server.js to start the application.
   
   ## Technologies
 - Node
